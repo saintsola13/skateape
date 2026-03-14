@@ -17,8 +17,8 @@
 html { scroll-behavior: smooth; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
 header { text-align: center; padding: 56px 20px 36px; border-bottom: 1px solid var(--border); }
-.gorilla { font-size: 52px; display: block; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.gorilla { display: block; width: 220px; height: 220px; object-fit: contain; margin: 0 auto 12px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 8px 24px rgba(255,92,0,0.35)); }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
 h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px,12vw,96px); letter-spacing:0.25em; line-height:1; }
 h1 span { color: var(--orange); }
 .subtitle { font-size:10px; letter-spacing:0.3em; color:var(--muted); margin-top:10px; text-transform:uppercase; }
@@ -69,7 +69,7 @@ main { max-width:860px; margin:36px auto 80px; padding:0 20px; }
 </head>
 <body>
 <header>
-  <span class="gorilla">🦍</span>
+  <img class="gorilla" src="ape.jpg" alt="Skate Ape">
   <h1>SKATE<span> APE</span></h1>
   <p class="subtitle">Trick Foot Positioning Reference — Offline Database</p>
   <span class="db-count">147 tricks in database</span>
