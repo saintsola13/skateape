@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKATE APE — Trick Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0e0e0e; --surface: #161616; --surface2: #1e1e1e;
+  --border: #2a2a2a; --border2: #383838;
+  --orange: #FF5C00; --yellow: #F5C518; --red: #FF3B30; --teal: #00C9A7;
+  --text: #f0f0f0; --muted: #666; --muted2: #999;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; min-height: 100vh; overflow-x: hidden; }
+header { text-align: center; padding: 56px 20px 36px; border-bottom: 1px solid var(--border); }
+.gorilla { font-size: 52px; display: block; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px,12vw,96px); letter-spacing:0.25em; line-height:1; }
+h1 span { color: var(--orange); }
+.subtitle { font-size:10px; letter-spacing:0.3em; color:var(--muted); margin-top:10px; text-transform:uppercase; }
+.db-count { display:inline-block; margin-top:16px; font-size:10px; letter-spacing:0.2em; color:var(--teal); border:1px solid var(--teal); padding:3px 10px; }
+.search-wrap { max-width:660px; margin:32px auto 0; padding:0 20px; }
+.search-input { width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:'DM Mono',monospace; font-size:14px; padding:14px 18px; outline:none; transition:border-color 0.2s; letter-spacing:0.04em; }
+.search-input::placeholder { color:var(--muted); }
+.search-input:focus { border-color:var(--orange); }
+.filters { max-width:860px; margin:20px auto 0; padding:0 20px; display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+.filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; padding:6px 12px; cursor:pointer; transition:all 0.15s; }
+.filter-btn:hover { border-color:var(--text); color:var(--text); }
+.filter-btn.active { border-color:var(--orange); color:var(--orange); background:rgba(255,92,0,0.05); }
+main { max-width:860px; margin:36px auto 80px; padding:0 20px; }
+.results-info { font-size:10px; color:var(--muted); letter-spacing:0.15em; margin-bottom:16px; }
+.tricks-list { display:flex; flex-direction:column; gap:2px; }
+.trick-card { background:var(--surface); border:1px solid var(--border); cursor:pointer; transition:border-color 0.15s, background 0.15s; position:relative; overflow:hidden; }
+.trick-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--orange); transform:scaleY(0); transition:transform 0.2s; transform-origin:bottom; }
+.trick-card:hover { border-color:var(--border2); background:var(--surface2); }
+.trick-card:hover::before, .trick-card.open::before { transform:scaleY(1); }
+.trick-card.open { border-color:var(--border2); background:var(--surface2); }
+.trick-header { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; user-select:none; }
+.trick-left { display:flex; flex-direction:column; gap:3px; }
+.trick-name { font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:0.1em; color:var(--text); }
+.trick-cat { font-size:9px; letter-spacing:0.2em; color:var(--muted); text-transform:uppercase; }
+.trick-right { display:flex; align-items:center; gap:12px; flex-shrink:0; }
+.difficulty { font-size:9px; letter-spacing:0.15em; font-weight:500; padding:3px 9px; border:1px solid; text-transform:uppercase; white-space:nowrap; }
+.difficulty.beginner { color:#00C9A7; border-color:#00C9A7; }
+.difficulty.intermediate { color:#F5C518; border-color:#F5C518; }
+.difficulty.advanced { color:#FF5C00; border-color:#FF5C00; }
+.difficulty.expert { color:#FF3B30; border-color:#FF3B30; }
+.chevron { color:var(--muted); font-size:10px; transition:transform 0.2s; line-height:1; }
+.trick-card.open .chevron { transform:rotate(180deg); }
+.trick-detail { display:none; padding:0 20px 20px; border-top:1px solid var(--border); }
+.trick-card.open .trick-detail { display:block; }
+.foot-positions { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+@media(max-width:500px){ .foot-positions { grid-template-columns:1fr; } }
+.foot-box { background:var(--bg); border:1px solid var(--border); padding:12px 14px; }
+.foot-label { font-size:9px; letter-spacing:0.25em; color:var(--orange); text-transform:uppercase; margin-bottom:7px; }
+.foot-desc { font-size:11px; line-height:1.75; color:var(--muted2); }
+.tip-box { margin-top:12px; background:rgba(245,197,24,0.04); border:1px solid rgba(245,197,24,0.15); padding:12px 14px; }
+.tip-label { font-size:9px; letter-spacing:0.2em; color:var(--yellow); margin-bottom:5px; text-transform:uppercase; }
+.tip-text { font-size:11px; line-height:1.75; color:var(--muted2); }
+.no-results { text-align:center; padding:60px 20px; color:var(--muted); font-size:12px; letter-spacing:0.1em; }
+.legend { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-top:40px; padding-top:28px; border-top:1px solid var(--border); }
+.legend-item { display:flex; align-items:center; gap:8px; font-size:10px; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase; }
+.legend-dot { width:8px; height:8px; border-radius:50%; }
+</style>
+</head>
+<body>
+<header>
+  <span class="gorilla">🦍</span>
+  <h1>SKATE<span> APE</span></h1>
+  <p class="subtitle">Trick Foot Positioning Reference — Offline Database</p>
+  <span class="db-count">147 tricks in database</span>
+  <div class="search-wrap">
+    <input class="search-input" id="searchInput" type="text" placeholder="Search tricks... kickflip, noseslide, 5-0..." autocomplete="off">
+  </div>
+  <div class="filters" id="filters"></div>
+</header>
+<main>
+  <p class="results-info" id="resultsInfo"></p>
+  <div class="tricks-list" id="tricksList"></div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#00C9A7"></div>Beginner</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F5C518"></div>Intermediate</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF5C00"></div>Advanced</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF3B30"></div>Expert</div>
+  </div>
+</main>
+<script>
+(function(){
+
+var tricks = [
+  { name:"Ollie", category:"Fundamentals", difficulty:"Beginner", back:"Ball of foot on the tail, roughly centered. Toes hang slightly off the edge.", front:"Mid-board, angled 30–45° toward nose. Foot is relaxed, ready to slide up.", tip:"Pop the tail straight down — don't scoop. Drag your front foot up toward the nose to level the board." },
+  { name:"Nollie", category:"Fundamentals", difficulty:"Intermediate", back:"Behind the trucks, angled toward tail — mirrors front foot in a regular ollie.", front:"On the nose, centered. Toes at the edge. This foot does the popping.", tip:"Pop the nose down with your front foot, then drag your back foot up to level. Opposite mechanics of a regular ollie." },
+  { name:"Fakie Ollie", category:"Fundamentals", difficulty:"Beginner", back:"Ball of foot on the tail (rolling backward — the tail is now trailing behind you).", front:"Same as regular ollie — mid-board, angled toward direction of travel.", tip:"You're rolling backward so the pop comes from what's trailing. Commit fully to the direction." },
+  { name:"Manual", category:"Fundamentals", difficulty:"Beginner", back:"Over the back trucks, weight on the balls of your feet.", front:"Over or just behind front trucks, lightly resting for balance.", tip:"Lean back just enough to lift the nose. Lock your core and use small ankle adjustments to stay balanced." },
+  { name:"Nose Manual", category:"Fundamentals", difficulty:"Intermediate", back:"Behind back trucks, light pressure for micro-balance corrections.", front:"On or just ahead of front trucks. Weight forward on balls of front foot.", tip:"Lean forward with your hips over the front foot. Tiny front ankle adjustments keep you level." },
+  { name:"Kickflip", category:"Flip Tricks", difficulty:"Beginner", back:"Ball of foot on tail, slightly heelside of center.", front:"Below front bolts, angled ~45°. Toes hanging slightly off the toeside edge.", tip:"Flick your front foot diagonally off the toeside pocket — forward and off the edge. Pop and flick at the same time." },
+  { name:"Heelflip", category:"Flip Tricks", difficulty:"Beginner", back:"Ball of foot on tail, slightly toeside of center.", front:"Below front bolts, angled ~45°. Heel hanging slightly off the heelside edge.", tip:"Kick your front foot forward and off the heelside. Keep your shoulders square to the board." },
+  { name:"360 Flip (Tre Flip)", category:"Flip Tricks", difficulty:"Intermediate", back:"Toeside edge of tail — enables the 360 backside scoop.", front:"Below front bolts, toes off toeside edge, angled toward toe edge.", tip:"Scoop hard backside with your back foot while flicking the front foot for the kickflip. The scoop creates the 360 rotation." },
+  { name:"Hardflip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail, slightly toeside.", front:"Below front bolts, toes off toeside — stays more forward than a regular kickflip.", tip:"Scoop frontside with your back foot and kickflip with your front simultaneously. The frontside scoop opposes the flip — counterintuitive but commit to it." },
+  { name:"Varial Flip", category:"Flip Tricks", difficulty:"Intermediate", back:"Toeside edge of tail for backside pop shove-it scoop.", front:"Below front bolts, toes off toeside for the kickflip flick.", tip:"Pop shove-it with the back foot and kickflip with the front at the same time. Let the board complete both rotations before catching." },
+  { name:"Varial Heelflip", category:"Flip Tricks", difficulty:"Intermediate", back:"Heelside of tail — set up for a frontside shove-it scoop.", front:"Below front bolts, heel off heelside for the heelflip flick.", tip:"Frontside pop shove-it with back foot + heelflip with front. Both rotations complete together — timing is key." },
+  { name:"Inward Heel", category:"Flip Tricks", difficulty:"Advanced", back:"Toeside of tail — backside scoop.", front:"Below front bolts, heel off heelside edge.", tip:"Backside scoop plus heelflip. The board spins and flips toward you. Stay centered and wait for it to come back under your feet." },
+  { name:"Laser Flip (360 Heelflip)", category:"Flip Tricks", difficulty:"Expert", back:"Toeside of tail for hard frontside 360 scoop.", front:"Below front bolts, heel off heelside edge for the heelflip.", tip:"Frontside 360 scoop with back foot while heelflipping with front. Very technical — master each component separately before combining." },
+  { name:"Double Kickflip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail, slightly heelside.", front:"Below front bolts, toes off toeside — flick faster and harder than a single kickflip.", tip:"Flick harder and jump higher. Give the board enough air time to rotate twice before you catch it." },
+  { name:"Impossible", category:"Flip Tricks", difficulty:"Advanced", back:"Back foot wraps around the tail — positioned toward the toe edge at the very end of the tail.", front:"Off the board or barely touching mid-board. This trick is almost entirely back foot.", tip:"Scoop the tail around and under your back foot in a vertical 360° wrap. Your back foot guides the full rotation around itself." },
+  { name:"Bigflip", category:"Flip Tricks", difficulty:"Advanced", back:"Toeside of tail for a big backside 360 scoop.", front:"Below front bolts, toes off toeside for the kickflip.", tip:"360 pop shove-it plus kickflip simultaneously. Stay over the board and catch with both feet." },
+  { name:"Hospital Flip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Toes off toeside edge — front foot catches the board mid-flip and reverses it back.", tip:"Start a kickflip but catch it halfway with your front foot and flip it back the other direction. Front foot does a half-flip then reverses." },
+  { name:"Gazelle Flip", category:"Flip Tricks", difficulty:"Expert", back:"Toeside edge of tail — aggressive backside 360 scoop.", front:"Toes off toeside edge — kickflip flick.", tip:"360 backside body rotation plus 360 board rotation plus kickflip. You rotate with the board. Fully commit to the body spin." },
+  { name:"Pressure Flip", category:"Flip Tricks", difficulty:"Intermediate", back:"Heelside edge of tail — presses down and forward to create the flip.", front:"Off the board or barely touching toeside — the flip is generated by back foot pressing.", tip:"Stomp the heelside of the tail to create a frontside flip. No traditional pop — it's a pressure and stomp motion." },
+  { name:"Pop Shove-It", category:"Shove-Its", difficulty:"Beginner", back:"Toeside edge of tail — creates the backside 180 board spin.", front:"Below front bolts, angled slightly. Front foot guides and catches.", tip:"Scoop the tail backside (toward your heels) while popping. The board spins 180° under you with no body rotation needed." },
+  { name:"Frontside Shove-It", category:"Shove-Its", difficulty:"Beginner", back:"Heelside edge of tail for the frontside scoop.", front:"Below front bolts, slightly toeside.", tip:"Scoop the tail frontside (toward your toes). Board spins 180° frontside. Keep shoulders square." },
+  { name:"360 Shove-It", category:"Shove-Its", difficulty:"Intermediate", back:"Toeside edge of tail — same side as pop shove-it but exaggerate the scoop.", front:"Slightly off the board or barely touching — let the board spin freely.", tip:"Pop shove-it but scoop harder so the board completes a full 360°. Give it space, don't rush the catch." },
+  { name:"Backside 180", category:"180s", difficulty:"Beginner", back:"Ball of foot on tail, slightly heelside.", front:"Below front bolts. Body winds up frontside before popping.", tip:"Wind your shoulders frontside, then unwind backside as you pop. Body and board rotate 180° together." },
+  { name:"Frontside 180", category:"180s", difficulty:"Beginner", back:"Ball of foot on tail, slightly toeside.", front:"Below front bolts. Body winds up backside before popping.", tip:"Wind your shoulders backside, pop and spin frontside. Arms help drive the rotation. Land fakie." },
+  { name:"Switch Backside 180", category:"Switch", difficulty:"Advanced", back:"Your switch back foot (normally your front foot) on the tail.", front:"Your switch front foot (normally your back foot) below the front bolts.", tip:"Same mechanics as a regular backside 180 but in switch stance. The wind-up direction reverses — everything feels opposite." },
+  { name:"Nollie Backside 180", category:"Nollie", difficulty:"Intermediate", back:"Behind trucks, angled — mirrors front foot.", front:"On the nose, popping foot.", tip:"Pop the nose and spin backside 180. Front foot drives the pop, body rotates backside. Land fakie." },
+  { name:"Nollie Frontside 180", category:"Nollie", difficulty:"Intermediate", back:"Behind trucks.", front:"On the nose for the pop.", tip:"Pop the nose, wind up backside, spin frontside 180. Commit to the full rotation." },
+  { name:"50-50 Grind", category:"Grinds", difficulty:"Beginner", back:"Ball of foot over tail, slightly behind back trucks.", front:"Below front bolts, over front trucks.", tip:"Ollie so both trucks land on the obstacle simultaneously. Distribute weight evenly. Lean slightly forward to maintain speed." },
+  { name:"5-0 Grind", category:"Grinds", difficulty:"Intermediate", back:"Ball of foot on tail — your back truck grinds, front truck raised.", front:"Below front bolts, weight shifts back so the front truck lifts.", tip:"Ollie and lean back so only your back truck grinds. Hold a manual position on the obstacle. Don't over-lean or you'll fly off the back." },
+  { name:"Nosegrind", category:"Grinds", difficulty:"Intermediate", back:"Behind back trucks — back truck lifts.", front:"Over front trucks near the nose — front truck grinds.", tip:"Ollie and lean forward onto the front truck. Similar to a nose manual on the obstacle. Use your front ankle to control the grind angle." },
+  { name:"Noseslide", category:"Grinds", difficulty:"Intermediate", back:"Behind back trucks, back foot guides the tail up.", front:"Over the nose — the nose of the board slides on the obstacle.", tip:"Ollie and slide the nose onto the ledge or rail. Come in at a slight angle, let the nose lock in, then kick out to land." },
+  { name:"Tailslide", category:"Grinds", difficulty:"Intermediate", back:"On the tail — the tail slides on the obstacle.", front:"Over or ahead of front trucks.", tip:"Ollie and pivot so the tail slides on the obstacle. Come in backside, pop, pivot 90°, slide the tail, kick out frontside to land." },
+  { name:"Crooked Grind (K-Grind)", category:"Grinds", difficulty:"Advanced", back:"Behind trucks, slightly raised.", front:"Over and past the front truck — nose angled downward into the obstacle.", tip:"Like a nosegrind but the board is angled with the nose pointed down into the ledge. Lock the front truck at an angle." },
+  { name:"Smith Grind", category:"Grinds", difficulty:"Advanced", back:"On or just behind back truck — back truck grinds, board angled.", front:"Well behind front trucks — nose angles away from the obstacle.", tip:"Like a 5-0 but angled so the nose points away. Back truck grinds while front hangs off the side. Strong back foot pressure needed." },
+  { name:"Feeble Grind", category:"Grinds", difficulty:"Advanced", back:"Over back truck — back truck grinds on the obstacle.", front:"Slightly past front trucks, board angled so nose dips away.", tip:"Ollie onto the rail so your back truck catches and the front of the board hangs in front. Similar entry to 50-50 but angled away." },
+  { name:"Bluntslide", category:"Grinds", difficulty:"Advanced", back:"On the very end of the tail — tail slides with wheels hanging over.", front:"Over or behind front trucks, weight slightly forward.", tip:"Ollie and lock the tail onto the obstacle with the back wheels hanging over. More tail engagement than a tailslide. Kick out to pop off." },
+  { name:"Noseblunt Slide", category:"Grinds", difficulty:"Expert", back:"Behind back trucks.", front:"On the very tip of the nose — nose locks with front wheels hanging over the obstacle.", tip:"The nose slides with front wheels over the edge. Requires precise control. One of the hardest grind variations — commitment is everything." },
+  { name:"Willy Grind", category:"Grinds", difficulty:"Expert", back:"Behind back trucks, back wheels on the obstacle.", front:"Off the board or barely touching — mostly a back foot trick.", tip:"Only the back wheels grind. The board goes nearly vertical against the obstacle. Old school and highly technical." },
+  { name:"Boardslide", category:"Slides", difficulty:"Beginner", back:"Behind back trucks.", front:"Ahead of front trucks.", tip:"Ollie and rotate 90° so the board is perpendicular to the obstacle. The middle slides. Rotate back 90° to land." },
+  { name:"Lipslide", category:"Slides", difficulty:"Intermediate", back:"Behind back trucks — back of board goes over the obstacle.", front:"Ahead of front trucks — front stays on your side.", tip:"Ollie backside so the back of the board goes over the obstacle. More committed rotation than a boardslide. Rotate back to land." },
+  { name:"Frontside Boardslide", category:"Slides", difficulty:"Intermediate", back:"Behind back trucks.", front:"Ahead of front trucks.", tip:"Same as boardslide but approached frontside. Ollie and rotate frontside 90°. You're more blind to the landing — fully commit." },
+  { name:"Darkslide", category:"Slides", difficulty:"Expert", back:"Behind back trucks — grip tape will face up.", front:"Ahead of front trucks.", tip:"Flip the board upside-down and boardslide on the grip tape. Requires a kickflip or heelflip motion to invert the board mid-air." },
+  { name:"Primo Slide", category:"Slides", difficulty:"Expert", back:"Behind back trucks — board balanced on its side.", front:"Ahead of front trucks.", tip:"Balance the board on its side so wheels are sideways and slide. Extremely technical — mostly done as a flatground balance trick." },
+  { name:"Indy Grab", category:"Grabs", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Ollie and grab the toeside of the board between the trucks with your back hand. Bend your knees to bring the board up." },
+  { name:"Melon Grab", category:"Grabs", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Grab the heelside of the board with your back hand between the trucks. Tweak the board toward your back foot." },
+  { name:"Stalefish Grab", category:"Grabs", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Reach your back hand behind your back leg and grab the heelside behind the back truck. Requires flexibility — twist your torso." },
+  { name:"Mute Grab", category:"Grabs", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Grab the toeside of the board with your front hand between the trucks. Cross your front arm over to the toe edge." },
+  { name:"Nose Grab", category:"Grabs", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Over the nose.", tip:"Grab the nose with your front hand. Poke the front foot out to extend the board toward your hand." },
+  { name:"Tail Grab", category:"Grabs", difficulty:"Intermediate", back:"On the tail.", front:"Below front bolts.", tip:"Grab the tail with your back hand. Kick the back foot out to poke the tail toward your hand." },
+  { name:"Airwalk", category:"Grabs", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Grab the nose with your front hand then kick both feet off the board simultaneously. Looks like you're walking in mid-air." },
+  { name:"Christ Air", category:"Grabs", difficulty:"Expert", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Grab the board with one hand and extend both arms out sideways like a cross. Requires huge air and total commitment." },
+  { name:"Heel Grab", category:"Grabs", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Reach down with either hand and grab your heel or the heelside of the board. Common in transition skating." },
+  { name:"Drop In", category:"Transition", difficulty:"Beginner", back:"On the tail — tail rests on the coping at the top of the ramp.", front:"Over front trucks, ready to press down the ramp.", tip:"Set the tail on the coping, lean the front foot down onto the ramp and commit your weight forward immediately. Hesitation causes falls." },
+  { name:"Rock to Fakie", category:"Transition", difficulty:"Beginner", back:"Behind back trucks.", front:"Over front trucks and slightly past — nose rocks onto the lip.", tip:"Ride up, let the front trucks go over the coping so the board rocks on it, then push the nose down to come back in fakie." },
+  { name:"Axle Stall", category:"Transition", difficulty:"Beginner", back:"Over back trucks.", front:"Over front trucks.", tip:"Ride up and stall both trucks on the coping. Come in at a slight angle, lock both trucks, then push off to come back in." },
+  { name:"Disaster", category:"Transition", difficulty:"Intermediate", back:"Behind back trucks.", front:"Ahead of front trucks.", tip:"Ride up, pop a 180, land with the middle of the board on the coping. Both trucks hang off either side. Revert back in." },
+  { name:"Blunt to Fakie", category:"Transition", difficulty:"Intermediate", back:"On the tail — tail stalls on the coping.", front:"Over front trucks, slightly raised.", tip:"Ride up and stall the tail on the coping with front trucks raised (blunt stall). Kick the tail forward to come back in fakie." },
+  { name:"Nollie Kickflip", category:"Nollie", difficulty:"Intermediate", back:"Behind trucks, angled.", front:"On the nose — pops and flicks for the kickflip.", tip:"Pop the nose and flick your front foot off the toeside. All mechanics of a kickflip but initiated from the nose." },
+  { name:"Nollie Heelflip", category:"Nollie", difficulty:"Intermediate", back:"Behind trucks.", front:"On the nose, heel slightly off heelside edge.", tip:"Pop the nose and kick forward off the heel side. Use your front ankle — nollie heelflips are very pop-heavy." },
+  { name:"Nollie 360 Flip", category:"Nollie", difficulty:"Expert", back:"Behind trucks.", front:"On the nose — massive pop and flick needed.", tip:"Nollie pop plus 360 scoop plus kickflip. Master the nollie 360 shove-it and nollie kickflip independently before combining." },
+  { name:"Fakie Kickflip", category:"Fakie", difficulty:"Intermediate", back:"Ball of foot on the fakie tail (now trailing behind you as you roll backward).", front:"Below front bolts, toes off toeside.", tip:"Pop and flick exactly like a regular kickflip — the mechanics are identical, only the rolling direction changes." },
+  { name:"Fakie Heelflip", category:"Fakie", difficulty:"Intermediate", back:"Ball of foot on the fakie tail.", front:"Below front bolts, heel off heelside.", tip:"Heelflip mechanics while rolling fakie. Body oriented backward but the flick is identical to a regular heelflip." },
+  { name:"Half Cab (Fakie FS 180)", category:"Fakie", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Below front bolts. Body winds up backside.", tip:"Rolling fakie, pop and spin frontside 180 to land regular. Wind up and commit to the full rotation." },
+  { name:"Caballerial (Full Cab)", category:"Fakie", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts. Body winds up backside for full 360.", tip:"Full 360 backside rotation while rolling fakie. Named after Steve Caballero. Body and board rotate together. Commit fully." },
+  { name:"Fakie Bigflip", category:"Fakie", difficulty:"Advanced", back:"Toeside of tail for backside scoop while rolling fakie.", front:"Below front bolts, toes off toeside for kickflip.", tip:"Fakie 360 shove-it plus kickflip. Rolling backward makes the scoop feel very different. Let the board fully rotate before catching." },
+  { name:"Switch Kickflip", category:"Switch", difficulty:"Advanced", back:"Your switch back foot (normally your front foot) on the tail.", front:"Your switch front foot (normally your back foot) below the bolts — toes off toeside.", tip:"The flick comes from what is normally your back foot. Build up with switch ollies first — the muscle memory is completely different." },
+  { name:"Switch Heelflip", category:"Switch", difficulty:"Advanced", back:"Switch back foot on tail.", front:"Switch front foot below bolts, heel off heelside.", tip:"Heelflip mechanics but in switch. The front foot flick goes forward off the heel from an unfamiliar stance." },
+  { name:"Switch 360 Flip", category:"Switch", difficulty:"Expert", back:"Switch back foot on toeside of tail for switch backside scoop.", front:"Switch front foot, toes off toeside for the kickflip.", tip:"Switch tre flip. One of the hardest flatground tricks. Master switch 360 shove-it and switch kickflip independently first." },
+  { name:"Switch Backside Flip", category:"Switch", difficulty:"Expert", back:"Switch back foot on tail, heelside for backside 180 scoop.", front:"Switch front foot below bolts, toes off toeside for kickflip.", tip:"Switch backside 180 plus kickflip. Body rotates backside 180° while board kickflips. Very disorienting in switch." },
+  { name:"End Over", category:"Old School", difficulty:"Beginner", back:"Ball of foot on tail.", front:"Near the nose — used to lift and pivot.", tip:"A manual pivot: press the nose up, pivot the board 180° on the back wheels, set it down. No pop — pure pivoting footwork." },
+  { name:"Spacewalk", category:"Old School", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Near the nose.", tip:"Alternating manual pivots — nose manual, pivot, back manual, pivot — creating a walking motion. Loose trucks help." },
+  { name:"Casper Stall", category:"Old School", difficulty:"Expert", back:"Ball of foot grips the underside of the board — board is half-flipped to its side.", front:"On top of the other side of the board balancing the flipped position.", tip:"Flip the board to rest on one set of wheels and your back foot simultaneously. Balance with the board on its side. Extremely technical." },
+  { name:"Kickflip Backside 50-50", category:"Combos", difficulty:"Advanced", back:"Ball of foot on tail, heelside for backside spin — also provides kickflip pop.", front:"Below front bolts, toes off toeside for the kickflip flick.", tip:"Kickflip into a backside 50-50 grind. Time the flip so the board lands on the obstacle with both trucks locked in." },
+  { name:"360 Flip Backside Lipslide", category:"Combos", difficulty:"Expert", back:"Toeside of tail for tre flip scoop.", front:"Below front bolts, toes off toeside for the kickflip component.", tip:"Tre flip into a backside lipslide. Full 360 shove-it plus kickflip, then lock into the lipslide. Requires mastery of both tricks independently." },
+
+  // Old School additions
+  { name:"No Comply", category:"Old School", difficulty:"Beginner", back:"Ball of foot on tail — pops the board.", front:"Steps completely off the board, then back on.", tip:"Step your front foot off to the ground, pop the tail with your back foot to spin or flip the board, then step back on. No ollie required — pure style." },
+  { name:"Boneless", category:"Old School", difficulty:"Beginner", back:"Ball of foot on tail — pops the board.", front:"Grabs the board while stepping off with front foot.", tip:"Grab the board with your front hand while stepping off with your front foot. Plant the front foot, jump back on. Classic 80s trick — all about commitment and style." },
+  { name:"Fastplant", category:"Old School", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Plants briefly on the obstacle or ground before jumping back on.", tip:"Grab the board and plant your front foot on the obstacle or ground, push off and get back on. Like a boneless but off a ledge or curb." },
+  { name:"Fingerflip", category:"Old School", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Uses fingers to flip the board while in the air.", tip:"Ollie, then flick the board with your fingers in any direction you want. Back foot stays over the board to catch. Endless variations possible." },
+  { name:"Bert Slide", category:"Old School", difficulty:"Beginner", back:"Ball of foot on tail.", front:"Plants on the ground for the low pivot.", tip:"Plant your front hand and front foot on the ground while the board drags and pivots around those planted points. Low, stylish, very old school." },
+  { name:"One Foot Ollie", category:"Old School", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Kicks fully extended away from the board mid-air.", tip:"Ollie and kick your front foot straight out while the board stays under your back foot. Catch it back on the way down. A clean style trick." },
+
+  // Flip Tricks additions
+  { name:"Frontside Flip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail, heelside — sets up frontside 180 wind-up.", front:"Below front bolts, toes off toeside for the kickflip.", tip:"Frontside 180 rotation combined with a kickflip. Wind up backside, pop and kickflip while spinning frontside 180. Board flips and you rotate together." },
+  { name:"Backside Flip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail, toeside — sets up backside 180 wind-up.", front:"Below front bolts, toes off toeside for the kickflip.", tip:"Backside 180 plus kickflip. Wind up frontside, pop and kickflip while spinning backside 180. Very satisfying trick when landed clean." },
+  { name:"Halfcab Kickflip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail — rolling fakie.", front:"Below front bolts, toes off toeside.", tip:"Rolling fakie, pop and kickflip while spinning frontside 180 to land regular. The fakie direction changes how the flip feels — commit to both the flip and the rotation." },
+  { name:"Halfcab Heelflip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail — rolling fakie.", front:"Below front bolts, heel off heelside.", tip:"Rolling fakie, pop and heelflip while spinning frontside 180 to land regular. Heelflip mechanics plus halfcab rotation all from fakie." },
+  { name:"Late Kickflip", category:"Flip Tricks", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts — flick initiated after the peak of the ollie.", tip:"Ollie normally, then at the peak or on descent, flick your front foot for the kickflip. The late timing is everything. Looks very clean when done right." },
+  { name:"360 Hardflip", category:"Flip Tricks", difficulty:"Expert", back:"Toeside of tail for frontside 360 scoop.", front:"Below front bolts, toes off toeside.", tip:"Frontside 360 scoop combined with a kickflip. Like a hardflip but with a full 360° frontside body and board rotation. Extremely technical — rare trick." },
+  { name:"Dolphin Flip", category:"Flip Tricks", difficulty:"Expert", back:"Ball of foot on tail — unique forward scoop motion.", front:"Below front bolts, toes pointing more forward.", tip:"The board flips forward — nose going down first, not a regular kickflip rotation. Scoop forward off the tail and flick with the front foot going forward. Very rare." },
+  { name:"Nollie Hardflip", category:"Flip Tricks", difficulty:"Expert", back:"Behind trucks, angled for frontside scoop from nollie.", front:"On the nose — drives the pop and kickflip from nollie.", tip:"Nollie mechanics plus frontside scoop plus kickflip. The frontside scoop from nollie is extremely counterintuitive. One of the rarest tricks landed." },
+
+  // Shove-Its additions
+  { name:"Frontside 360 Shove-It", category:"Shove-Its", difficulty:"Advanced", back:"Heelside of tail — aggressive frontside 360 scoop.", front:"Slightly off the board — let the board spin completely free.", tip:"Frontside pop shove-it but with a full 360° board rotation. Scoop hard frontside and jump high enough to give the board room to fully complete the rotation." },
+
+  // 180s additions
+  { name:"Frontside 360", category:"180s", difficulty:"Advanced", back:"Ball of foot on tail, toeside.", front:"Below front bolts — body winds up completely backside.", tip:"Full 360° frontside rotation. Wind up as far backside as possible, pop and spin all the way around frontside. Shoulders lead and pull the rotation." },
+  { name:"Backside 360", category:"180s", difficulty:"Advanced", back:"Ball of foot on tail, heelside.", front:"Below front bolts — body winds up frontside.", tip:"Full 360° backside rotation. One of the cleanest street tricks when done right. Wind up frontside, pop and spin all the way around backside." },
+  { name:"Backside 270 Nosegrind", category:"180s", difficulty:"Expert", back:"Ball of foot on tail, heelside — winds up for BS 270.", front:"Below front bolts.", tip:"Backside 270° rotation into a nosegrind. Pop, spin 270° backside and lock the front truck into a nosegrind on the obstacle. Precise rotation control is everything." },
+
+  // Grinds additions
+  { name:"Overcrooks", category:"Grinds", difficulty:"Advanced", back:"Behind trucks.", front:"Past front trucks — nose angled and hanging over the far side of the obstacle.", tip:"Like a crooked grind but the board goes past perpendicular — the nose hangs over the far edge. Lock the front truck at an exaggerated outward angle." },
+  { name:"Salad Grind", category:"Grinds", difficulty:"Advanced", back:"On or just behind back truck — back truck grinds.", front:"Ahead of front trucks, pointing away from obstacle.", tip:"Back truck grinds while the board angles with the nose pointing toward the obstacle. Opposite lean from a smith grind. Very stylish on transition." },
+  { name:"Suski Grind", category:"Grinds", difficulty:"Advanced", back:"Behind back trucks.", front:"Over the front truck — front truck grinds at an outward angle.", tip:"Front truck grinds at an aggressive outward angle — like a nosegrind but the nose points further away. Requires precise front truck locking." },
+  { name:"Hurricane Grind", category:"Grinds", difficulty:"Expert", back:"On the back truck — back truck grinds.", front:"Off the obstacle side — board rotated 180° from your approach direction.", tip:"Ollie backside 180 into a 5-0 grind. Back truck grinds while you're riding the opposite direction from your approach. Kickturn or revert to exit." },
+  { name:"Frontside Nosegrind", category:"Grinds", difficulty:"Advanced", back:"Behind back trucks.", front:"Over front trucks near the nose.", tip:"Nosegrind approached frontside. You're more blind to the obstacle than a regular nosegrind — full commitment required. Front ankle controls the grind angle." },
+  { name:"Frontside Tailslide", category:"Grinds", difficulty:"Advanced", back:"On the tail — tail slides on the obstacle.", front:"Ahead of front trucks.", tip:"Approach frontside, ollie and pivot 90° so the tail slides on the obstacle. You'll be facing away during the slide. Kickturn or revert to exit clean." },
+  { name:"Switch 50-50", category:"Grinds", difficulty:"Advanced", back:"Switch back foot over switch back trucks.", front:"Switch front foot over switch front trucks.", tip:"Both trucks grind in switch stance. The ollie and balance point feel completely different in your off-stance. Build from switch ollies first." },
+  { name:"Switch Nosegrind", category:"Grinds", difficulty:"Expert", back:"Switch back foot behind trucks.", front:"Switch front foot over nose.", tip:"Front truck grinds in switch. Balance and locking the front truck is significantly harder in your off-stance. Master switch ollies onto ledges first." },
+  { name:"Switch Tailslide", category:"Grinds", difficulty:"Expert", back:"Switch back foot on tail.", front:"Switch front foot ahead of trucks.", tip:"Tailslide in switch. Approach switch, ollie and pivot into the tailslide. The approach angle and pivot direction are completely reversed." },
+  { name:"Nollie 50-50", category:"Grinds", difficulty:"Advanced", back:"Behind nollie trucks.", front:"On the nose — initiates the grind from nollie.", tip:"50-50 initiated from nollie position. Both trucks lock in on the obstacle. The nollie approach significantly changes the entry angle." },
+
+  // Slides additions
+  { name:"Switch Boardslide", category:"Slides", difficulty:"Advanced", back:"Switch back foot behind trucks.", front:"Switch front foot ahead of trucks.", tip:"Boardslide in switch stance. Ollie and rotate 90° in switch — the rotation direction and entry feel mirrored from your regular boardslide." },
+  { name:"Switch Noseslide", category:"Slides", difficulty:"Expert", back:"Switch back foot behind trucks.", front:"Switch front foot over nose.", tip:"Noseslide in switch. The nose locks onto the obstacle in your off-stance. Approach angle and landing feel completely foreign at first — a serious milestone trick." },
+  { name:"Nollie Noseslide", category:"Slides", difficulty:"Advanced", back:"Behind trucks — back truck raised.", front:"On the nose — initiates and locks into the noseslide from nollie.", tip:"Noseslide initiated nollie. Pop the nose and guide it directly into the slide. The nollie weight-forward naturally helps the nose lock in." },
+  { name:"Frontside Noseslide", category:"Slides", difficulty:"Advanced", back:"Behind back trucks.", front:"Over the nose.", tip:"Come in frontside, ollie, and lock the nose onto the obstacle while blind to the approach. You face away from the slide direction. Kickturn out clean." },
+
+  // Grabs additions
+  { name:"Japan Air", category:"Grabs", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts — front knee bends inward hard.", tip:"Grab the toeside between the trucks with your front hand and pull the board up while bending both knees inward. Tweak the board toward your back shoulder." },
+  { name:"Benihana", category:"Grabs", difficulty:"Advanced", back:"Kicks completely off the tail mid-air.", front:"Below front bolts.", tip:"Ollie, kick your back foot completely off the board, grab the tail with your back hand, then put your back foot back on to land. Very dramatic looking." },
+  { name:"Lien Air", category:"Grabs", difficulty:"Intermediate", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Grab the toeside of the board with your front hand. Named after Neil Blender (Lien = Neil backwards). A foundational grab in transition skating." },
+  { name:"Roast Beef", category:"Grabs", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Reach your back hand between your legs and grab the heelside of the board between the trucks. Requires good flexibility and serious air time." },
+  { name:"Crail Grab", category:"Grabs", difficulty:"Advanced", back:"On or near the tail.", front:"Below front bolts.", tip:"Grab the tail with your front hand — cross your arm all the way across your body to reach the tail. Uncomfortable and stylish at the same time." },
+  { name:"Madonna", category:"Grabs", difficulty:"Expert", back:"Kicks completely off the board mid-air.", front:"Below front bolts.", tip:"Grab the nose with your front hand, kick your back foot off the board and extend it out, then bring it back to land. Named after the pop star — flashy and rare." },
+  { name:"Rocket Air", category:"Grabs", difficulty:"Advanced", back:"On the tail — pushes the nose down.", front:"Over the nose — both feet push the board to point straight down.", tip:"Both feet angle the nose of the board straight toward the ground while in the air. The board points rocket-style at the earth. Grab the nose for extra style." },
+  { name:"Crossbone", category:"Grabs", difficulty:"Advanced", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Indy grab but you pull the board across your body in a twisting motion while extending one leg. A stylish tweaked variation of the indy." },
+
+  // Transition additions
+  { name:"FS Rock", category:"Transition", difficulty:"Intermediate", back:"Behind back trucks.", front:"Over front trucks — presses over the coping.", tip:"Ride up frontside, press the front truck over the coping into a rock. The board rocks on the lip. Tilt forward and drop back in. Your blind side makes this trickier." },
+  { name:"Rock and Roll", category:"Transition", difficulty:"Intermediate", back:"Behind back trucks.", front:"Over front trucks — rocks over coping then kickturns back.", tip:"Rock the front truck over the coping, then kickturn 180° to come back in regular. Classic coping trick — the kickturn back in is where most people fall." },
+  { name:"Pivot Fakie", category:"Transition", difficulty:"Intermediate", back:"On or near tail — back truck pivots on coping.", front:"Over front trucks.", tip:"Ride up, pivot your back truck on the coping 180° facing back into the ramp, then ride in fakie. Clean pivot with both feet staying on the board." },
+  { name:"Nosepick", category:"Transition", difficulty:"Intermediate", back:"Behind back trucks.", front:"Over nose — nose balances on coping.", tip:"Ride up and balance only the nose on the coping while the rest of the board hangs in the air. Hold the balance then pop back in." },
+  { name:"Tailbone Stall", category:"Transition", difficulty:"Beginner", back:"On the tail — tail stalls on coping.", front:"Over front trucks, slightly raised.", tip:"Ride up and stall the tail on the coping with the front slightly lifted. Hold the balance, then pop back in regular." },
+  { name:"Egg Plant", category:"Transition", difficulty:"Expert", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Plant your lead hand on the coping, go fully inverted with your body above the ramp, balance on the planted hand, then drop back in. Total commitment required." },
+  { name:"Handplant", category:"Transition", difficulty:"Expert", back:"Ball of foot on tail.", front:"Below front bolts.", tip:"Reach over the coping and plant one hand on the deck while going inverted. Balance one-handed above the ramp then come back in. Pure commitment and upper body strength." },
+
+  // Fakie additions
+  { name:"Fakie Pop Shove-It", category:"Fakie", difficulty:"Beginner", back:"Toeside of fakie tail for backside scoop.", front:"Below front bolts.", tip:"Rolling fakie, pop shove-it backside. The board spins 180° under you. One of the most accessible fakie tricks — great starting point for fakie variations." },
+  { name:"Fakie Frontside Shove-It", category:"Fakie", difficulty:"Intermediate", back:"Heelside of fakie tail for frontside scoop.", front:"Below front bolts.", tip:"Rolling fakie, frontside pop shove-it. The board spins frontside 180°. Slightly trickier than fakie pop shove-it due to the frontside scoop direction." },
+  { name:"Fakie Varial Flip", category:"Fakie", difficulty:"Advanced", back:"Toeside of fakie tail for backside scoop.", front:"Below front bolts, toes off toeside.", tip:"Fakie pop shove-it plus kickflip. Rolling fakie makes both the scoop and flip feel different. Let the board fully complete both rotations before catching." },
+  { name:"Fakie 360 Flip", category:"Fakie", difficulty:"Expert", back:"Toeside of fakie tail — hard backside scoop rolling fakie.", front:"Below front bolts, toes off toeside.", tip:"Fakie tre flip. Rolling fakie plus 360 scoop plus kickflip. Extremely technical. Master fakie kickflip and fakie 360 shove-it independently before combining." },
+  { name:"Fakie Hardflip", category:"Fakie", difficulty:"Expert", back:"Heelside of fakie tail for frontside scoop.", front:"Below front bolts, toes off toeside for kickflip.", tip:"Fakie frontside scoop plus kickflip. The frontside scoop while rolling fakie is very counterintuitive. Technical and rare — respect it." },
+  { name:"Fakie Backside Flip", category:"Fakie", difficulty:"Advanced", back:"Ball of foot on fakie tail, toeside for BS wind-up.", front:"Below front bolts, toes off toeside.", tip:"Rolling fakie — backside 180 body rotation plus kickflip. You land regular after spinning backside from fakie." },
+  { name:"Fakie Frontside Flip", category:"Fakie", difficulty:"Advanced", back:"Ball of foot on fakie tail, heelside for FS wind-up.", front:"Below front bolts, toes off toeside for kickflip.", tip:"Rolling fakie — frontside 180 body rotation plus kickflip. You land back in fakie. Body spins frontside while board kickflips." },
+
+  // Switch additions
+  { name:"Switch Frontside 180", category:"Switch", difficulty:"Advanced", back:"Switch back foot on tail, heelside.", front:"Switch front foot below bolts, winds up backside.", tip:"Frontside 180 in switch stance. The wind-up and rotation direction feel completely reversed from your regular frontside 180." },
+  { name:"Switch Pop Shove-It", category:"Switch", difficulty:"Advanced", back:"Switch back foot on toeside of tail.", front:"Switch front foot below bolts.", tip:"Pop shove-it in switch. The scoop direction from switch feels very unusual. Build from switch ollies and work your way up." },
+  { name:"Switch Frontside Flip", category:"Switch", difficulty:"Expert", back:"Switch back foot on tail, heelside for FS 180.", front:"Switch front foot below bolts, toes off toeside.", tip:"Frontside 180 plus kickflip in switch. Everything about the timing and rotation is mirrored from regular. Serious level of commitment needed." },
+  { name:"Switch Varial Flip", category:"Switch", difficulty:"Expert", back:"Switch back foot on toeside of tail for backside scoop.", front:"Switch front foot below bolts, toes off toeside.", tip:"Varial flip in switch. Pop shove-it plus kickflip in your off-stance. Both components are already hard in switch — combining them is elite territory." },
+  { name:"Switch Hardflip", category:"Switch", difficulty:"Expert", back:"Switch back foot on tail, toeside for frontside scoop.", front:"Switch front foot below bolts, toes off toeside.", tip:"Hardflip in switch. Frontside scoop plus kickflip in your off-stance. One of the most technically demanding flatground tricks in existence." },
+
+  // Nollie additions
+  { name:"Nollie Pop Shove-It", category:"Nollie", difficulty:"Intermediate", back:"Behind trucks — mirrors the nollie stance.", front:"On the nose, toeside edge for backside scoop.", tip:"Pop the nose and scoop backside for a 180° board spin. Same mechanic as a pop shove-it but initiated from the nose. Front foot handles pop and scoop." },
+  { name:"Nollie Frontside Shove-It", category:"Nollie", difficulty:"Intermediate", back:"Behind trucks.", front:"On the nose, heelside for frontside scoop.", tip:"Nollie pop with a frontside scoop. The board spins frontside 180°. Front foot drives both the pop and the scoop direction." },
+  { name:"Nollie 360 Shove-It", category:"Nollie", difficulty:"Advanced", back:"Behind trucks.", front:"On the nose — aggressive backside scoop.", tip:"Nollie pop shove-it with a full 360° board rotation. Pop hard from the nose and scoop aggressively for the full rotation." },
+  { name:"Nollie Varial Flip", category:"Nollie", difficulty:"Advanced", back:"Behind trucks.", front:"On the nose — backside scoop plus kickflip flick.", tip:"Nollie pop shove-it plus kickflip. Both rotations happen simultaneously. Front foot handles everything — the pop, the scoop, and the kickflip flick." },
+  { name:"Nollie Varial Heel", category:"Nollie", difficulty:"Advanced", back:"Behind trucks.", front:"On the nose — frontside scoop plus heelflip.", tip:"Nollie frontside shove-it plus heelflip. The front foot handles pop, scoop, and flick. Extremely front-foot dependent trick." },
+  { name:"Nollie Backside Flip", category:"Nollie", difficulty:"Advanced", back:"Behind trucks, heelside for backside 180.", front:"On the nose — pops and kickflips while body spins backside.", tip:"Nollie backside 180 plus kickflip. Body spins backside 180 while board kickflips from nollie. You land fakie." },
+  { name:"Nollie Frontside Flip", category:"Nollie", difficulty:"Advanced", back:"Behind trucks, toeside for frontside 180.", front:"On the nose — pops and kickflips while body spins frontside.", tip:"Nollie frontside 180 plus kickflip. Both initiated from the nose. Land fakie after spinning frontside." },
+  { name:"Nollie Inward Heel", category:"Nollie", difficulty:"Expert", back:"Behind trucks.", front:"On the nose — backside scoop plus heelflip.", tip:"Nollie backside scoop plus heelflip. The board spins and flips toward you from nollie position. Very technical and genuinely rare." },
+
+  // Additional Combos
+  { name:"Kickflip FS Boardslide", category:"Combos", difficulty:"Expert", back:"Ball of foot on tail, heelside for FS rotation.", front:"Below front bolts, toes off toeside for kickflip.", tip:"Kickflip into a frontside boardslide. The kickflip must rotate and level out perfectly perpendicular to the obstacle. Time the flip with the frontside spin." },
+  { name:"Heelflip Noseslide", category:"Combos", difficulty:"Expert", back:"Ball of foot on tail.", front:"Below front bolts, heel off heelside.", tip:"Heelflip into a noseslide. Board heelflips and must land with the nose locked on the obstacle. Very precise — the heelflip and approach angle must align perfectly." },
+  { name:"Kickflip Backside Tailslide", category:"Combos", difficulty:"Expert", back:"Ball of foot on tail, toeside for backside spin.", front:"Below front bolts, toes off toeside for kickflip.", tip:"Kickflip combined with backside approach into a tailslide. Kickflip, spin backside, lock the tail. Multiple things happening simultaneously — clean execution is everything." },
+  { name:"360 Flip Noseslide", category:"Combos", difficulty:"Expert", back:"Toeside of tail for tre flip scoop.", front:"Below front bolts, toes off toeside.", tip:"Tre flip into a noseslide. The board completes its full 360° rotation and kickflip while the nose lands locked on the obstacle. Elite level execution required." },
+  { name:"Nollie Kickflip Noseslide", category:"Combos", difficulty:"Expert", back:"Behind trucks.", front:"On the nose — handles kickflip and locks into noseslide.", tip:"Nollie kickflip that locks directly into a noseslide. The nollie kickflip needs to flip and land with the nose already positioned to slide. Extremely technical entry." },
+  { name:"Hardflip Noseslide", category:"Combos", difficulty:"Expert", back:"Toeside of tail for frontside scoop.", front:"Below front bolts, toes off toeside for kickflip.", tip:"Hardflip into a noseslide. The frontside scoop plus kickflip must land nose-first on the obstacle. One of the most technical combo tricks you can do on a ledge." }
+];
+
+var categories = ["All","Fundamentals","Flip Tricks","Shove-Its","180s","Switch","Nollie","Grinds","Slides","Grabs","Transition","Fakie","Old School","Combos"];
+var activeFilter = "All";
+var searchQuery = "";
+var openCard = null;
+
+var filtersEl = document.getElementById("filters");
+categories.forEach(function(cat) {
+  var btn = document.createElement("button");
+  btn.className = "filter-btn" + (cat === "All" ? " active" : "");
+  btn.textContent = cat;
+  btn.addEventListener("click", function() {
+    activeFilter = cat;
+    document.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+    btn.classList.add("active");
+    openCard = null;
+    render();
+  });
+  filtersEl.appendChild(btn);
+});
+
+document.getElementById("searchInput").addEventListener("input", function(e) {
+  searchQuery = e.target.value.toLowerCase().trim();
+  openCard = null;
+  render();
+});
+
+function render() {
+  var list = document.getElementById("tricksList");
+  var info = document.getElementById("resultsInfo");
+
+  var filtered = tricks.filter(function(t) {
+    var matchCat = activeFilter === "All" || t.category === activeFilter;
+    var q = searchQuery;
+    var matchSearch = !q
+      || t.name.toLowerCase().indexOf(q) !== -1
+      || t.category.toLowerCase().indexOf(q) !== -1
+      || t.difficulty.toLowerCase().indexOf(q) !== -1;
+    return matchCat && matchSearch;
+  });
+
+  info.textContent = filtered.length + " trick" + (filtered.length !== 1 ? "s" : "") + " found";
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="no-results">No tricks match your search.</div>';
+    return;
+  }
+
+  list.innerHTML = "";
+
+  filtered.forEach(function(t) {
+    var card = document.createElement("div");
+    card.className = "trick-card";
+
+    var diffKey = t.difficulty.toLowerCase();
+
+    card.innerHTML =
+      '<div class="trick-header">'
+      + '<div class="trick-left">'
+        + '<div class="trick-name">' + t.name.toUpperCase() + '</div>'
+        + '<div class="trick-cat">' + t.category + '</div>'
+      + '</div>'
+      + '<div class="trick-right">'
+        + '<div class="difficulty ' + diffKey + '">' + t.difficulty + '</div>'
+        + '<span class="chevron">&#9660;</span>'
+      + '</div>'
+      + '</div>'
+      + '<div class="trick-detail">'
+        + '<div class="foot-positions">'
+          + '<div class="foot-box"><div class="foot-label">Back Foot</div><div class="foot-desc">' + t.back + '</div></div>'
+          + '<div class="foot-box"><div class="foot-label">Front Foot</div><div class="foot-desc">' + t.front + '</div></div>'
+        + '</div>'
+        + '<div class="tip-box"><div class="tip-label">&#128161; Key Tip</div><div class="tip-text">' + t.tip + '</div></div>'
+      + '</div>';
+
+    card.querySelector(".trick-header").addEventListener("click", function() {
+      if (card.classList.contains("open")) {
+        card.classList.remove("open");
+        openCard = null;
+      } else {
+        if (openCard) openCard.classList.remove("open");
+        card.classList.add("open");
+        openCard = card;
+      }
+    });
+
+    list.appendChild(card);
+  });
+}
+
+render();
+
+})();
+</script>
+</body>
+</html>
